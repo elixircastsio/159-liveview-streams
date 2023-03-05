@@ -1,0 +1,59 @@
+<h1 class="text-center text-xl mb-6 font-semibold leading-8">
+  Listing Albums
+</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.album_index_path(@socket, :index)}>
+    <.live_component
+      module={TeacherWeb.AlbumLive.FormComponent}
+      id={@album.id || :new}
+      title={@page_title}
+      action={@live_action}
+      album={@album}
+      return_to={Routes.album_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<div class="mb-4">
+  <.link patch={~p"/albums/new"} class="underline">New album</.link>
+</div>
+
+<table class="border-collapse border border-slate-400">
+  <thead>
+    <tr>
+      <th class="p-2 bg-gray-50 border border-slate-300">Title</th>
+      <th class="p-2 bg-gray-50 border border-slate-300">Artist</th>
+      <th class="p-2 bg-gray-50 border border-slate-300">Summary</th>
+      <th class="p-2 bg-gray-50 border border-slate-300">Year</th>
+
+      <th class="p-2 bg-gray-50 border border-slate-300"></th>
+    </tr>
+  </thead>
+  <tbody id="albums">
+    <%= for album <- @albums do %>
+      <tr id={"album-#{album.id}"}>
+        <td class="p-2 border border-slate-300"><%= album.title %></td>
+        <td class="p-2 border border-slate-300"><%= album.artist %></td>
+        <td class="p-2 border border-slate-300"><%= String.slice(album.summary, 0..100) %> ...</td>
+        <td class="p-2 border border-slate-300"><%= album.year %></td>
+        <td class="p-2 border border-slate-300">
+          <span>
+            <%= live_redirect "Show",
+              to: Routes.album_show_path(@socket, :show, album) %>
+          </span>
+          <span>
+            <%= live_patch "Edit",
+              to: Routes.album_index_path(@socket, :edit, album) %>
+          </span>
+          <span>
+            <%= link "Delete",
+              to: "#",
+              phx_click: "delete",
+              phx_value_id: album.id,
+              data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
